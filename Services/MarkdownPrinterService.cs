@@ -35,7 +35,6 @@ internal sealed class MarkdownPrinterService : IMarkdownPrinterService
 			await platformWebView.EnsureCoreWebView2Async();
 
 			var completionSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-			using var registration = cancellationToken.Register(() => completionSource.TrySetCanceled(cancellationToken));
 
 			void HandleNavigationCompleted(WinUIWebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
 			{
@@ -57,6 +56,13 @@ internal sealed class MarkdownPrinterService : IMarkdownPrinterService
 					completionSource.TrySetException(new InvalidOperationException("The installed WebView2 runtime does not support the Windows print dialog API."));
 				}
 			}
+
+			using var registration = cancellationToken.Register(() =>
+			{
+				platformWebView.NavigationCompleted -= HandleNavigationCompleted;
+				platformWebView.CoreWebView2?.Stop();
+				completionSource.TrySetCanceled(cancellationToken);
+			});
 
 			platformWebView.NavigationCompleted += HandleNavigationCompleted;
 			platformWebView.NavigateToString(htmlContent);
