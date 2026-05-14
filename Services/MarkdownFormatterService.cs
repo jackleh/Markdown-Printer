@@ -77,7 +77,7 @@ internal sealed partial class MarkdownFormatterService : IMarkdownFormatterServi
 		return hasWrittenContent ? $"{builder.ToString().TrimEnd()}{Environment.NewLine}" : string.Empty;
 	}
 
-	public string ToHtmlDocument(string title, string markdown, bool useLandscapeLayout, double baseTextSize, bool includePageNumbers)
+	public string ToHtmlDocument(string title, string markdown, bool useLandscapeLayout, double baseTextSize)
 	{
 		var encodedTitle = WebUtility.HtmlEncode(string.IsNullOrWhiteSpace(title) ? "Markdown Printer Document" : title.Trim());
 		var htmlBody = string.IsNullOrWhiteSpace(markdown)
@@ -86,14 +86,6 @@ internal sealed partial class MarkdownFormatterService : IMarkdownFormatterServi
 		var pageOrientation = useLandscapeLayout ? "landscape" : "portrait";
 		var maxWidth = useLandscapeLayout ? 1280 : 980;
 		var normalizedBaseTextSize = Math.Clamp(baseTextSize, 12d, 28d);
-		var pageFooterMarkup = includePageNumbers
-			? """
-			    <footer class="page-number-footer" aria-hidden="true">
-			        Page <span class="page-number"></span>
-			    </footer>
-			"""
-			: string.Empty;
-		var bodyClass = includePageNumbers ? "has-page-numbers" : string.Empty;
 
 		return $$"""
 		<!DOCTYPE html>
@@ -104,10 +96,10 @@ internal sealed partial class MarkdownFormatterService : IMarkdownFormatterServi
 		    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data: https:;" />
 		    <title>{{encodedTitle}}</title>
 		    <style>
-		        @page {
-		            size: {{pageOrientation}};
-		            margin: 0.5in;
-		        }
+		@page {
+		    size: {{pageOrientation}};
+		    margin: 0.5in;
+		}
 
 		        :root {
 		            color-scheme: light dark;
@@ -121,32 +113,11 @@ internal sealed partial class MarkdownFormatterService : IMarkdownFormatterServi
 		            color: #0f172a;
 		        }
 
-		        body.has-page-numbers {
-		            padding-bottom: 32px;
-		        }
-
 		        main {
 		            max-width: {{maxWidth}}px;
 		            margin: 0 auto;
 		            padding: 24px 28px 40px;
 		            line-height: 1.65;
-		        }
-
-		        .page-number-footer {
-		            display: none;
-		            position: fixed;
-		            left: 0;
-		            right: 0;
-		            bottom: 0;
-		            padding: 8px 0 10px;
-		            font-size: 0.8em;
-		            text-align: center;
-		            color: #7f1d1d;
-		            background: rgba(248, 250, 252, 0.92);
-		        }
-
-		        .page-number::after {
-		            content: counter(page);
 		        }
 
 		        pre {
@@ -182,19 +153,12 @@ internal sealed partial class MarkdownFormatterService : IMarkdownFormatterServi
 		        img {
 		            max-width: 100%;
 		        }
-
-		        @media print {
-		            .page-number-footer {
-		                display: block;
-		            }
-		        }
 		    </style>
 		</head>
-		<body class="{{bodyClass}}">
+		<body>
 		    <main>
 		{{htmlBody}}
 		    </main>
-		{{pageFooterMarkup}}
 		</body>
 		</html>
 		""";

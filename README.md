@@ -8,7 +8,6 @@ Paste or type markdown on the left, review the rendered result on the right, the
 - print the rendered document
 - switch between portrait and landscape
 - increase or decrease the base text size
-- optionally include page numbers
 
 ## Highlights
 
@@ -75,6 +74,57 @@ dotnet build -t:Run -f net10.0-windows10.0.19041.0
 dotnet build -t:Run -f net10.0-maccatalyst
 ```
 
+## Distributable builds
+
+The repository now includes packaging scripts and a GitHub Actions workflow for shareable desktop builds.
+
+### Windows distributable
+
+Create a zip that you can send to Windows users:
+
+```powershell
+.\scripts\publish-windows.ps1
+```
+
+Output:
+
+```text
+artifacts\dist\MarkdownPrinter-windows.zip
+```
+
+This produces an unpackaged Windows app folder and zips it for sharing.
+
+### Mac distributable
+
+On a Mac with Xcode and the Mac Catalyst workload installed:
+
+```bash
+./scripts/publish-maccatalyst.sh
+```
+
+Output:
+
+```text
+artifacts/dist/MarkdownPrinter-maccatalyst.app.zip
+```
+
+This script looks for the generated `.app` bundle and zips it in a Mac-friendly format.
+
+### GitHub Actions build
+
+There is also a manual workflow at:
+
+```text
+.github/workflows/build-distributables.yml
+```
+
+Run **Build distributables** from GitHub Actions to produce:
+
+- `MarkdownPrinter-windows.zip`
+- `MarkdownPrinter-maccatalyst.app.zip`
+
+That is the easiest way to generate both shareable artifacts from the repository.
+
 ## How to use
 
 ### Main editor
@@ -103,7 +153,6 @@ Available options:
 
 - **Page layout**: Portrait or Landscape
 - **Base text size**: adjust with the minus and plus icons
-- **Page numbers**: toggle on or off
 - **Save** icon: write files to a selected folder
 - **Print** icon: open the system print dialog
 - **X**: close the overlay
@@ -113,7 +162,7 @@ Available options:
 When you save:
 
 1. Open the output preview.
-2. Adjust layout, text size, and page number settings.
+2. Adjust layout and text size.
 3. Click the save icon.
 4. Choose an output folder.
 
@@ -129,7 +178,7 @@ The app does **not** silently save into app storage for normal save operations.
 When you print:
 
 1. Open the output preview.
-2. Adjust layout, text size, and page number settings.
+2. Adjust layout and text size.
 3. Click the print icon.
 
 Behavior by platform:
@@ -210,6 +259,8 @@ Important files:
 - **Mac Catalyst folder selection is not implemented yet**. Save currently throws a platform-not-supported exception there.
 - This project is currently optimized around desktop workflows.
 - Printing depends on the platform print stack and available runtime support.
+- The Mac distributable build script must be run on macOS to produce a real `.app` bundle.
+- Shared desktop builds are unsigned, so Windows SmartScreen or macOS Gatekeeper may warn users before first launch.
 
 ## Public repository notes
 

@@ -19,7 +19,6 @@ public interface IMarkdownFormatterService
 	/// <param name="markdown">The normalized markdown content.</param>
 	/// <param name="useLandscapeLayout">When <see langword="true"/>, the rendered document uses a landscape page layout.</param>
 	/// <param name="baseTextSize">The base text size, in pixels, for the rendered document.</param>
-	/// <param name="includePageNumbers">When <see langword="true"/>, the rendered document includes page numbers in the output footer.</param>
 	/// <returns>A complete HTML document string.</returns>
-	string ToHtmlDocument(string title, string markdown, bool useLandscapeLayout, double baseTextSize, bool includePageNumbers);
+	string ToHtmlDocument(string title, string markdown, bool useLandscapeLayout, double baseTextSize);
 }

@@ -32,7 +32,6 @@ public sealed class MainPageViewModel : ObservableObject
 	private readonly IMarkdownPrinterService printerService;
 
 	private string generatedMarkdownPath = string.Empty;
-	private bool includePageNumbers;
 	private bool isOutputPreviewOpen;
 	private HtmlWebViewSource previewSource = new();
 	private string rawMarkdown = """
@@ -183,22 +182,6 @@ Console.WriteLine("Ready to print markdown.");
 	/// Gets the display label for the currently selected base text size.
 	/// </summary>
 	public string BaseTextSizeLabel => $"{BaseTextSize:0}px";
-
-	/// <summary>
-	/// Gets or sets a value indicating whether page numbers are included in output previews and exports.
-	/// </summary>
-	public bool IncludePageNumbers
-	{
-		get => includePageNumbers;
-		set
-		{
-			if (SetProperty(ref includePageNumbers, value))
-			{
-				InvalidateSavedDocument();
-				RefreshDerivedContent();
-			}
-		}
-	}
 
 	/// <summary>
 	/// Gets a value indicating whether the base text size can be decreased.
@@ -426,7 +409,7 @@ Console.WriteLine("Ready to print markdown.");
 	{
 		var normalizedMarkdown = GetNormalizedMarkdown();
 		var htmlDocument = CreateHtmlDocument(normalizedMarkdown);
-		var signature = $"{SuggestedFileName}\n{normalizedMarkdown}\n{SelectedPageOrientation}\n{BaseTextSizeLabel}\nPageNumbers:{IncludePageNumbers}";
+		var signature = $"{SuggestedFileName}\n{normalizedMarkdown}\n{SelectedPageOrientation}\n{BaseTextSizeLabel}";
 
 		return await documentService.SaveAsync(
 			DocumentTitle,
@@ -461,7 +444,7 @@ Console.WriteLine("Ready to print markdown.");
 
 	private string CreateHtmlDocument(string normalizedMarkdown)
 	{
-		return formatterService.ToHtmlDocument(DocumentTitle, normalizedMarkdown, UseLandscapeLayout, BaseTextSize, IncludePageNumbers);
+		return formatterService.ToHtmlDocument(DocumentTitle, normalizedMarkdown, UseLandscapeLayout, BaseTextSize);
 	}
 
 	private string GetNormalizedMarkdown()
