@@ -232,7 +232,7 @@
                     </Grid>
 
                     <Grid Grid.Row="1"
-                          ColumnDefinitions="240,260,150,*,Auto"
+                          ColumnDefinitions="240,260,*,Auto"
                           RowDefinitions="Auto,Auto"
                           ColumnSpacing="24"
                           RowSpacing="8">
@@ -244,11 +244,6 @@
                                Grid.Row="0"
                                Grid.Column="1"
                                Style="{StaticResource PanelTitleStyle}" />
-                        <Label Text="Page numbers"
-                               Grid.Row="0"
-                               Grid.Column="2"
-                               Style="{StaticResource PanelTitleStyle}" />
-
                         <Border Grid.Row="1"
                                 Grid.Column="0"
                                 Style="{StaticResource SurfaceBorderStyle}"
@@ -293,16 +288,8 @@
                             </Grid>
                         </HorizontalStackLayout>
 
-                        <CheckBox Grid.Row="1"
-                                  Grid.Column="2"
-                                  IsChecked="{Binding IncludePageNumbers}"
-                                  Color="{AppThemeBinding Light=#B91C1C, Dark=#FCA5A5}"
-                                  HorizontalOptions="Start"
-                                  VerticalOptions="Center"
-                                  SemanticProperties.Description="Include page numbers" />
-
                         <HorizontalStackLayout Grid.Row="1"
-                                               Grid.Column="4"
+                                               Grid.Column="3"
                                                Spacing="18"
                                                HorizontalOptions="End"
                                                VerticalOptions="Center">

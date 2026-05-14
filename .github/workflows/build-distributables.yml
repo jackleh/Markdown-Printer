@@ -1,0 +1,56 @@
+name: Build distributables
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Windows MAUI workload
+        run: dotnet workload install maui-windows
+
+      - name: Build Windows distributable
+        shell: pwsh
+        run: .\scripts\publish-windows.ps1
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MarkdownPrinter-windows
+          path: artifacts/dist/MarkdownPrinter-windows.zip
+
+  mac:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Mac Catalyst workload
+        run: dotnet workload install maccatalyst
+
+      - name: Build Mac distributable
+        run: |
+          chmod +x ./scripts/publish-maccatalyst.sh
+          ./scripts/publish-maccatalyst.sh
+
+      - name: Upload Mac artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MarkdownPrinter-maccatalyst
+          path: artifacts/dist/MarkdownPrinter-maccatalyst.app.zip
