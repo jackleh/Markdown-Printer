@@ -36,8 +36,31 @@ internal sealed class MarkdownPrinterService : IMarkdownPrinterService
 
 			var completionSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
+			// The preview WebView is bound to PreviewSource, so it may still be
+			// loading its own navigation when printing starts. Calling
+			// NavigateToString below aborts that in-flight navigation, which
+			// raises NavigationCompleted with IsSuccess == false. We must only
+			// act on the navigation we started here, identified by its
+			// NavigationId, otherwise that aborted preview navigation would be
+			// mistaken for a print failure and the print dialog would never open.
+			ulong? printNavigationId = null;
+
+			void HandleNavigationStarting(WinUIWebView2 sender, CoreWebView2NavigationStartingEventArgs args)
+			{
+				sender.NavigationStarting -= HandleNavigationStarting;
+				printNavigationId = args.NavigationId;
+			}
+
 			void HandleNavigationCompleted(WinUIWebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
 			{
+				// Ignore completions for any navigation other than the print
+				// navigation we initiated (for example a preview navigation that
+				// was still in flight and got superseded by NavigateToString).
+				if (printNavigationId is null || args.NavigationId != printNavigationId.Value)
+				{
+					return;
+				}
+
 				sender.NavigationCompleted -= HandleNavigationCompleted;
 
 				if (!args.IsSuccess)
@@ -59,11 +82,13 @@ internal sealed class MarkdownPrinterService : IMarkdownPrinterService
 
 			using var registration = cancellationToken.Register(() =>
 			{
+				platformWebView.NavigationStarting -= HandleNavigationStarting;
 				platformWebView.NavigationCompleted -= HandleNavigationCompleted;
 				platformWebView.CoreWebView2?.Stop();
 				completionSource.TrySetCanceled(cancellationToken);
 			});
 
+			platformWebView.NavigationStarting += HandleNavigationStarting;
 			platformWebView.NavigationCompleted += HandleNavigationCompleted;
 			platformWebView.NavigateToString(htmlContent);
 			await completionSource.Task;
