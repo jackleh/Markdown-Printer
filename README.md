@@ -173,6 +173,11 @@ The app writes:
 
 The app does **not** silently save into app storage for normal save operations.
 
+Folder selection by platform:
+
+- **Windows**: uses the WinUI folder picker
+- **Mac Catalyst**: uses the system document picker in folder mode; the sandbox grants write access to the folder you choose
+
 ## Print behavior
 
 When you print:
@@ -256,7 +261,6 @@ Important files:
 
 ## Known limitations
 
-- **Mac Catalyst folder selection is not implemented yet**. Save currently throws a platform-not-supported exception there.
 - This project is currently optimized around desktop workflows.
 - Printing depends on the platform print stack and available runtime support.
 - The Mac distributable build script must be run on macOS to produce a real `.app` bundle.
