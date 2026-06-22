@@ -9,6 +9,14 @@
         <!-- When App Sandbox is enabled, this value is required to open outgoing network connections. -->
         <key>com.apple.security.network.client</key>
         <true/>
+        <!-- Required so the sandbox grants read/write access to the folder the user
+             picks in the Save document picker when exporting markdown and HTML. -->
+        <key>com.apple.security.files.user-selected.read-write</key>
+        <true/>
+        <!-- Required so the sandboxed app can reach the printing system. Without it
+             macOS reports that the application does not support printing. -->
+        <key>com.apple.security.print</key>
+        <true/>
     </dict>
 </plist>
 
